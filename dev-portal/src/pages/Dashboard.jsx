@@ -3,7 +3,7 @@
 
 import React from 'react'
 
-import { Grid, Header, Popup, Loader, Message, List, Divider } from 'semantic-ui-react'
+import { Grid, Header, Popup, Loader, Message, List, Divider, Tab } from 'semantic-ui-react'
 
 import Chart from 'chart.js'
 import { fetchUsage, mapUsageByDate } from 'services/api-catalog'
@@ -87,67 +87,83 @@ function loadUsage (usagePlan, canvasId) {
 }
 
 export default observer(() => {
+
+    const panes = [
+        { menuItem: 'Dashboard', render: () => <Tab.Pane>
+
+                {store.usagePlans
+                    .filter(usagePlan => usagePlan.subscribed && usagePlan.apis.length)
+                    .map((usagePlan, index) => {
+                        const canvasId = `api-usage-chart-container-${usagePlan.id}` + index
+
+                        loadUsage(usagePlan, canvasId)
+
+                        return (
+                            <Grid.Column width={16} widescreen={8} key={usagePlan.id} style={{ marginBottom: '40px' }}>
+                                <Title apis={usagePlan.apis} />
+                                {usagePlan.throttle && (
+                                    <Message info>
+                                        <p>
+                                            Requests limited to {usagePlan.throttle.rateLimit} per second, and {usagePlan.throttle.burstLimit} in a burst.
+                                        </p>
+                                    </Message>
+                                )}
+                                {!usagePlan.usage ? (
+                                    <Loader active />
+                                ) : (
+                                    usagePlan.error ? (
+                                        <Message error content={usagePlan.error.toString()} />
+                                    ) : null
+                                )}
+                                <canvas id={canvasId} />
+                            </Grid.Column>
+                        )
+                    })}
+
+            </Tab.Pane> },
+        { menuItem: 'API Key', render: () => <Tab.Pane>
+                {
+                    store.apiKey
+                        ? (
+                            <code style={{
+                                background: 'black',
+                                border: '1px solid gray',
+                                padding: '7px 8px',
+                                color: 'lightgray',
+                                borderRadius: '5px'
+                            }}
+                            >
+                                {store.apiKey}
+                            </code>
+                        )
+                        // Note: this should be the same size as the text
+                        : <Loader active inline size='tiny'>
+                            {store.apiKeyFetchFailed ? <>
+                                Please wait a minute and try refreshing. If this doesn't work, please contact
+                                the admin for assistance.
+                            </> : null}
+                        </Loader>
+                }
+
+            </Tab.Pane> },
+        { menuItem: 'Export CSV', render: () => <Tab.Pane>
+
+
+            </Tab.Pane> },
+    ]
+
+    const TabExampleBasic = () => <Tab panes={panes} />
+
   return (
     <Grid container>
       <Grid.Row>
         <Grid.Column style={{ paddingTop: '40px' }}>
-            THIS IS A TEST
-          <Header size='medium'>API Key</Header>
-          {
-            store.apiKey
-              ? (
-                <code style={{
-                  background: 'black',
-                  border: '1px solid gray',
-                  padding: '7px 8px',
-                  color: 'lightgray',
-                  borderRadius: '5px'
-                }}
-                >
-                  {store.apiKey}
-                </code>
-              )
-              // Note: this should be the same size as the text
-              : <Loader active inline size='tiny'>
-                {store.apiKeyFetchFailed ? <>
-                  Please wait a minute and try refreshing. If this doesn't work, please contact
-                  the admin for assistance.
-                </> : null}
-              </Loader>
-          }
+            <TabExampleBasic />
         </Grid.Column>
       </Grid.Row>
       <Divider />
       <Grid.Row>
 
-        {store.usagePlans
-          .filter(usagePlan => usagePlan.subscribed && usagePlan.apis.length)
-          .map((usagePlan, index) => {
-            const canvasId = `api-usage-chart-container-${usagePlan.id}` + index
-
-            loadUsage(usagePlan, canvasId)
-
-            return (
-              <Grid.Column width={16} widescreen={8} key={usagePlan.id} style={{ marginBottom: '40px' }}>
-                <Title apis={usagePlan.apis} />
-                {usagePlan.throttle && (
-                  <Message info>
-                    <p>
-                      Requests limited to {usagePlan.throttle.rateLimit} per second, and {usagePlan.throttle.burstLimit} in a burst.
-                    </p>
-                  </Message>
-                )}
-                {!usagePlan.usage ? (
-                  <Loader active />
-                ) : (
-                  usagePlan.error ? (
-                    <Message error content={usagePlan.error.toString()} />
-                  ) : null
-                )}
-                <canvas id={canvasId} />
-              </Grid.Column>
-            )
-          })}
       </Grid.Row>
     </Grid>
   )

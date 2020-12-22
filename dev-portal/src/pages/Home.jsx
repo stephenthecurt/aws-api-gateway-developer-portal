@@ -20,12 +20,12 @@ export const HomePage = observer(() => (
     <Segment vertical textAlign='center' style={{ color: 'whitesmoke', backgroundColor: 'slategray', padding: '40px 0px', margin: '0px !important' }}>
       <Image centered size='small' src='/custom-content/home-image.png' />
       <Header as='h1' style={{ color: 'whitesmoke' }}>{fragments.Home.header}</Header>
-      <p>{fragments.Home.tagline}</p>
+      <p>NASA Star Data Platform</p>
       <Link to='/getting-started' data-testid='gettingStartedLink'>
         <Button positive>{fragments.Home.gettingStartedButton}</Button>
       </Link>
       <Link to='/apis' style={{ padding: '0.78571429em 1.5em 0.78571429em', color: 'white' }} data-testid='apiListLink'>
-        {fragments.Home.apiListButton}
+        Sign Up Now
       </Link>
     </Segment>
     <Segment vertical style={{ padding: '40px 0px', margin: '0 !important' }}>

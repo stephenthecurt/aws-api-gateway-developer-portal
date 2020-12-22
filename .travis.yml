@@ -21,8 +21,6 @@ install:
   - cd dev-portal
   - npm install
   - cd ..
-  # Restore what we have checked into Git
-  - node run reset-assets
   # Install global dependencies
   - npm install
 
